@@ -55,7 +55,7 @@
     .login-card h1 { font-family: var(--font-title); font-weight: 600; font-size: 2rem; margin-bottom: 20px; color: var(--memphis-navy); text-transform: uppercase; }
     .login-card input { width: 100%; margin-bottom: 16px; }
 
-    /* Contenedor Principal (Oculto hasta iniciar sesión) */
+    /* Contenedor Principal */
     #app-content { display: none; padding: 40px 20px; }
     
     .container { max-width: 1000px; margin: 0 auto; background: var(--bg); padding: 30px; border-radius: 20px; border: 2px solid var(--border); box-shadow: 10px 10px 0px var(--memphis-turquoise); }
@@ -127,17 +127,17 @@
 </head>
 <body>
 
-  <!-- PANTALLA DE LOGIN -->
+  <!-- LOGIN -->
   <div id="login-screen">
     <div class="login-card">
       <h1>Bienvenido</h1>
-      <p style="margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted);">Ingresa un nombre de usuario para acceder a tu biblioteca.</p>
+      <p style="margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted);">Ingresa un usuario para abrir tu biblioteca.</p>
       <input type="text" id="login-username" placeholder="Usuario (Ej. Steph)">
       <button class="btn-primary" style="width: 100%;" onclick="startApp()">Entrar</button>
     </div>
   </div>
 
-  <!-- APLICACIÓN PRINCIPAL -->
+  <!-- APP PRINCIPAL -->
   <div id="app-content">
     <div class="container">
       <header>
@@ -206,7 +206,6 @@
     let currentFilter = 'Todos';
     let currentUser = '';
 
-    // --- SISTEMA DE LOGIN ---
     function startApp() {
       const usernameInput = document.getElementById('login-username').value.trim();
       if (!usernameInput) {
@@ -219,7 +218,6 @@
       document.getElementById('app-content').style.display = 'block';
       document.getElementById('user-greeting').innerText = `Tracker de lecturas de ${currentUser}`;
       
-      // Cargar los libros ESPECÍFICOS de este usuario
       const savedData = localStorage.getItem(`bookTracker_${currentUser}`);
       books = savedData ? JSON.parse(savedData) : [];
       
@@ -235,7 +233,6 @@
       document.getElementById('login-screen').style.display = 'flex';
     }
 
-    // --- BUSCADOR (API GOOGLE BOOKS - MEJORADO ESPAÑOL) ---
     async function searchBook() {
       const query = document.getElementById('api-search-input').value;
       const dropdown = document.getElementById('results-dropdown');
@@ -245,13 +242,12 @@
       dropdown.innerHTML = '<div class="result-item">Buscando libros...</div>';
 
       try {
-        // Agregamos &langRestrict=es para priorizar libros en español
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&langRestrict=es&maxResults=8`);
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=8`);
         const data = await response.json();
         dropdown.innerHTML = '';
 
         if (!data.items || data.items.length === 0) {
-          dropdown.innerHTML = '<div class="result-item">No se encontraron resultados en español. Intenta otro término.</div>';
+          dropdown.innerHTML = '<div class="result-item">No se encontraron resultados. Intenta otro término.</div>';
           return;
         }
 
@@ -293,7 +289,6 @@
       document.getElementById('api-search-input').value = '';
     }
 
-    // --- FORMULARIO Y RENDERIZADO ---
     document.getElementById('book-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const newBook = {
@@ -327,7 +322,6 @@
     }
 
     function saveAndRender() {
-      // Guarda los datos bajo el nombre del usuario actual
       localStorage.setItem(`bookTracker_${currentUser}`, JSON.stringify(books));
       renderBooks();
       updateDashboard();
