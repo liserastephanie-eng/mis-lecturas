@@ -9,8 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <!-- Firebase SDKs (Compatibilidad) -->
+  <!-- SDKs de Firebase (Auth + Firestore) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
@@ -42,7 +43,6 @@
       background-size: 20px 20px;
     }
 
-    /* Pantalla de Login */
     #login-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
       background-color: var(--bg);
@@ -60,7 +60,6 @@
     .login-card p { margin-bottom: 20px; font-size: 0.85rem; color: var(--text-muted); }
     .login-card input { width: 100%; margin-bottom: 12px; padding: 14px; border: 2px solid var(--border); outline: none; font-family: var(--font-body); border-radius: 8px;}
 
-    /* Modales */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
       background: rgba(31, 59, 125, 0.4);
@@ -205,9 +204,9 @@
   <div id="login-screen">
     <div class="login-card">
       <h1>Tracker de Lectura</h1>
-      <p>Accede a tu biblioteca en la nube desde cualquier dispositivo.</p>
+      <p>Biblioteca en la nube protegida.</p>
       <input type="text" id="login-username" placeholder="Usuario (Ej. Steph)">
-      <input type="password" id="login-password" placeholder="Contraseña">
+      <input type="password" id="login-password" placeholder="Contraseña (Mínimo 6 caracteres)">
       <button class="btn-primary" id="login-btn" style="width: 100%;" onclick="startApp()">Entrar</button>
     </div>
   </div>
@@ -297,7 +296,6 @@
   </div>
 
   <script>
-    // CONFIGURACIÓN DE FIREBASE DIRECTA
     const firebaseConfig = {
       apiKey: "AIzaSyC2dkjV5ogRsgW8K_qN64hScylVryThA4o",
       authDomain: "mi-book-tracker.firebaseapp.com",
@@ -308,6 +306,7 @@
     };
 
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
     let books = [];
@@ -327,51 +326,61 @@
       }
     });
 
-    // SISTEMA DE USUARIOS Y SINCRONIZACIÓN EN LA NUBE (FIREBASE)
     async function startApp() {
       const usernameInput = document.getElementById('login-username').value.trim().toLowerCase();
       const passwordInput = document.getElementById('login-password').value.trim();
       const loginBtn = document.getElementById('login-btn');
-      
+
       if (!usernameInput || !passwordInput) {
         alert("Por favor ingresa un usuario y una contraseña.");
+        return;
+      }
+
+      if (passwordInput.length < 6) {
+        alert("La contraseña debe tener al menos 6 caracteres.");
         return;
       }
 
       loginBtn.innerText = "Conectando...";
       loginBtn.disabled = true;
 
-      try {
-        const userRef = db.collection('users').doc(usernameInput);
-        const doc = await userRef.get();
+      const email = `${usernameInput}@mybooktracker.app`;
 
-        if (doc.exists) {
-          if (doc.data().password !== passwordInput) {
-            alert("Contraseña incorrecta. Inténtalo de nuevo.");
-            loginBtn.innerText = "Entrar";
-            loginBtn.disabled = false;
-            return;
+      try {
+        let userCredential;
+        try {
+          userCredential = await auth.signInWithEmailAndPassword(email, passwordInput);
+        } catch (authError) {
+          if (authError.code === 'auth/user-not-found' || authError.code === 'auth/invalid-credential') {
+            userCredential = await auth.createUserWithEmailAndPassword(email, passwordInput);
+            alert(`¡Usuario "${usernameInput}" registrado con éxito!`);
+          } else {
+            throw authError;
           }
-          books = doc.data().books || [];
-        } else {
-          await userRef.set({
-            username: usernameInput,
-            password: passwordInput,
-            books: []
-          });
-          books = [];
-          alert(`¡Cuenta para "${usernameInput}" creada con éxito en la nube!`);
         }
 
+        const user = userCredential.user;
         currentUser = usernameInput;
+
+        const docRef = db.collection('users').doc(user.uid);
+        const doc = await docRef.get();
+
+        if (doc.exists) {
+          books = doc.data().books || [];
+        } else {
+          await docRef.set({ books: [] });
+          books = [];
+        }
+
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         document.getElementById('user-greeting').innerText = `Biblioteca de ${currentUser}`;
-        
+
         renderBooks();
         updateDashboard();
+
       } catch (error) {
-        alert("Error al conectar con la base de datos: " + error.message);
+        alert("Error de autenticación: " + error.message);
       } finally {
         loginBtn.innerText = "Entrar";
         loginBtn.disabled = false;
@@ -379,6 +388,7 @@
     }
 
     function logout() {
+      auth.signOut();
       currentUser = '';
       books = [];
       document.getElementById('login-username').value = '';
@@ -711,14 +721,12 @@
     function saveAndRender() {
       renderBooks();
       updateDashboard();
-      
-      // GUARDAR EN LA NUBE (FIREBASE)
-      if (currentUser) {
-        db.collection('users').doc(currentUser).update({
+
+      const user = auth.currentUser;
+      if (user) {
+        db.collection('users').doc(user.uid).set({
           books: books
-        }).catch(err => {
-          console.error("Error guardando en Firebase:", err);
-        });
+        }).catch(err => console.error("Error al guardar:", err));
       }
     }
 
