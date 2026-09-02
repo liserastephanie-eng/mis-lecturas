@@ -9,6 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   
+  <!-- Firebase SDKs (Compatibilidad) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <style>
     :root {
       --memphis-turquoise: #59dcd2;
@@ -38,7 +42,7 @@
       background-size: 20px 20px;
     }
 
-    /* Pantalla de Login con Contraseña */
+    /* Pantalla de Login */
     #login-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
       background-color: var(--bg);
@@ -56,7 +60,7 @@
     .login-card p { margin-bottom: 20px; font-size: 0.85rem; color: var(--text-muted); }
     .login-card input { width: 100%; margin-bottom: 12px; padding: 14px; border: 2px solid var(--border); outline: none; font-family: var(--font-body); border-radius: 8px;}
 
-    /* Modal General */
+    /* Modales */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
       background: rgba(31, 59, 125, 0.4);
@@ -201,10 +205,10 @@
   <div id="login-screen">
     <div class="login-card">
       <h1>Tracker de Lectura</h1>
-      <p>Inicia sesión o crea una cuenta nueva.</p>
+      <p>Accede a tu biblioteca en la nube desde cualquier dispositivo.</p>
       <input type="text" id="login-username" placeholder="Usuario (Ej. Steph)">
       <input type="password" id="login-password" placeholder="Contraseña">
-      <button class="btn-primary" style="width: 100%;" onclick="startApp()">Entrar</button>
+      <button class="btn-primary" id="login-btn" style="width: 100%;" onclick="startApp()">Entrar</button>
     </div>
   </div>
 
@@ -293,6 +297,19 @@
   </div>
 
   <script>
+    // CONFIGURACIÓN DE FIREBASE DIRECTA
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2dkjV5ogRsgW8K_qN64hScylVryThA4o",
+      authDomain: "mi-book-tracker.firebaseapp.com",
+      projectId: "mi-book-tracker",
+      storageBucket: "mi-book-tracker.firebasestorage.app",
+      messagingSenderId: "766577223514",
+      appId: "1:766577223514:web:0c683200494de67f5b3563"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     let books = [];
     let currentFilter = 'Todos';
     let currentUser = '';
@@ -310,43 +327,55 @@
       }
     });
 
-    // SISTEMA DE USUARIOS Y CONTRASEÑAS LOCALES
-    function startApp() {
-      const usernameInput = document.getElementById('login-username').value.trim();
+    // SISTEMA DE USUARIOS Y SINCRONIZACIÓN EN LA NUBE (FIREBASE)
+    async function startApp() {
+      const usernameInput = document.getElementById('login-username').value.trim().toLowerCase();
       const passwordInput = document.getElementById('login-password').value.trim();
+      const loginBtn = document.getElementById('login-btn');
       
       if (!usernameInput || !passwordInput) {
         alert("Por favor ingresa un usuario y una contraseña.");
         return;
       }
-      
-      // Cargar la base de datos de usuarios
-      let usersDb = JSON.parse(localStorage.getItem('bookTrackerUsers')) || {};
 
-      // Si el usuario ya existe, verificar contraseña
-      if (usersDb[usernameInput]) {
-        if (usersDb[usernameInput] !== passwordInput) {
-          alert("Contraseña incorrecta. Inténtalo de nuevo.");
-          return;
+      loginBtn.innerText = "Conectando...";
+      loginBtn.disabled = true;
+
+      try {
+        const userRef = db.collection('users').doc(usernameInput);
+        const doc = await userRef.get();
+
+        if (doc.exists) {
+          if (doc.data().password !== passwordInput) {
+            alert("Contraseña incorrecta. Inténtalo de nuevo.");
+            loginBtn.innerText = "Entrar";
+            loginBtn.disabled = false;
+            return;
+          }
+          books = doc.data().books || [];
+        } else {
+          await userRef.set({
+            username: usernameInput,
+            password: passwordInput,
+            books: []
+          });
+          books = [];
+          alert(`¡Cuenta para "${usernameInput}" creada con éxito en la nube!`);
         }
-      } else {
-        // Si el usuario NO existe, lo creamos
-        usersDb[usernameInput] = passwordInput;
-        localStorage.setItem('bookTrackerUsers', JSON.stringify(usersDb));
-        alert(`¡Usuario "${usernameInput}" creado con éxito!`);
-      }
 
-      // Iniciar sesión exitosa
-      currentUser = usernameInput;
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app-content').style.display = 'block';
-      document.getElementById('user-greeting').innerText = `Biblioteca de ${currentUser}`;
-      
-      const savedData = localStorage.getItem(`bookTracker_${currentUser}`);
-      books = savedData ? JSON.parse(savedData) : [];
-      
-      renderBooks();
-      updateDashboard();
+        currentUser = usernameInput;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+        document.getElementById('user-greeting').innerText = `Biblioteca de ${currentUser}`;
+        
+        renderBooks();
+        updateDashboard();
+      } catch (error) {
+        alert("Error al conectar con la base de datos: " + error.message);
+      } finally {
+        loginBtn.innerText = "Entrar";
+        loginBtn.disabled = false;
+      }
     }
 
     function logout() {
@@ -438,9 +467,7 @@
             finalCover = info.imageLinks.thumbnail.replace('http:', 'https:') || finalCover;
           }
         }
-      } catch (e) {
-        console.log("Error consultando Google Books");
-      }
+      } catch (e) {}
 
       document.getElementById('pages').value = finalPages;
       document.getElementById('pages').placeholder = "Páginas";
@@ -682,9 +709,17 @@
     }
 
     function saveAndRender() {
-      localStorage.setItem(`bookTracker_${currentUser}`, JSON.stringify(books));
       renderBooks();
       updateDashboard();
+      
+      // GUARDAR EN LA NUBE (FIREBASE)
+      if (currentUser) {
+        db.collection('users').doc(currentUser).update({
+          books: books
+        }).catch(err => {
+          console.error("Error guardando en Firebase:", err);
+        });
+      }
     }
 
     function updateDashboard() {
