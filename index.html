@@ -197,6 +197,43 @@
     
     .delete-btn { background: var(--memphis-navy); color: var(--memphis-white); border: none; font-size: 0.7rem; font-weight: 600; cursor: pointer; padding: 4px 8px; text-transform: uppercase; border-radius: 6px;}
     .delete-btn:hover { background: #ef4444; }
+
+    /* ========================================================== */
+    /* DISEÑO RESPONSIVO (PARA CELULARES)                         */
+    /* ========================================================== */
+    @media (max-width: 768px) {
+      #app-content { padding: 20px 10px; }
+      .container { padding: 20px 15px; box-shadow: 6px 6px 0px var(--memphis-turquoise); }
+      
+      header { flex-direction: column; align-items: flex-start; gap: 15px; text-align: left; }
+      .header-text h1 { font-size: 2rem; }
+      .logout-btn { width: 100%; text-align: center; }
+
+      .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; }
+      .kpi-card { padding: 15px; }
+      .kpi-card span { font-size: 1.8rem; }
+
+      .section-title { font-size: 1.5rem; margin-bottom: 16px; }
+      .card { padding: 20px; box-shadow: 5px 5px 0px var(--memphis-yellow); }
+
+      .search-box { flex-direction: column; }
+      .search-box button { width: 100%; }
+
+      .form-grid { grid-template-columns: 1fr; }
+
+      .controls-bar { flex-direction: column; align-items: stretch; gap: 15px; }
+      .tabs { justify-content: center; }
+      .sort-box { justify-content: space-between; }
+
+      .books-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+      .cover-img { height: 180px; }
+
+      .modal-card { padding: 20px; margin: 10px; max-height: 95vh; }
+      .modal-body { flex-direction: column; align-items: center; text-align: center; }
+      .modal-info { min-width: 100%; }
+      .badges { justify-content: center; }
+      .edit-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
