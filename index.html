@@ -76,11 +76,11 @@
       display: flex; align-items: center; justify-content: center;
     }
     .modal-body { display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap; }
-    .modal-cover { width: 140px; height: 200px; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0; }
+    .modal-cover { width: 130px; height: 190px; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0; }
     .modal-info { flex: 1; min-width: 200px; }
-    .modal-title { font-family: var(--font-title); font-size: 1.6rem; font-weight: 600; line-height: 1.2; margin-bottom: 6px; }
+    .modal-title { font-family: var(--font-title); font-size: 1.5rem; font-weight: 600; line-height: 1.2; margin-bottom: 6px; }
     .modal-author { font-size: 0.95rem; font-weight: 500; color: var(--text-muted); margin-bottom: 12px; }
-    .synopsis-text { margin-top: 16px; font-size: 0.9rem; line-height: 1.6; color: var(--text-main); max-height: 250px; overflow-y: auto; padding-right: 8px; border-top: 2px dashed var(--border); padding-top: 12px; }
+    .synopsis-text { margin-top: 16px; font-size: 0.88rem; line-height: 1.6; color: var(--text-main); max-height: 250px; overflow-y: auto; padding-right: 8px; border-top: 2px dashed var(--border); padding-top: 12px; }
 
     /* Contenedor Principal */
     #app-content { display: none; padding: 40px 20px; }
@@ -128,7 +128,7 @@
     .tab-btn:hover { color: var(--memphis-navy); border-color: var(--border); }
     .tab-btn.active { background: var(--memphis-navy); color: var(--memphis-white); border-color: var(--memphis-navy); }
 
-    /* TARJETAS MÁS PEQUEÑAS Y COMPACTAS */
+    /* TARJETAS COMPACTAS */
     .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; }
     .book-card { 
       background: var(--card-bg); padding: 12px; border: 2px solid var(--border); 
@@ -197,7 +197,7 @@
       <div class="card">
         <h2 class="section-title">Añadir Libro</h2>
         <div class="search-box">
-          <input type="text" id="api-search-input" placeholder="Buscar título o autor (ej: God of Pain)...">
+          <input type="text" id="api-search-input" placeholder="Buscar título o autor (ej: God of Fury)...">
           <button class="btn-primary" onclick="searchBook()">Buscar</button>
         </div>
         <div id="results-dropdown" class="results-dropdown"></div>
@@ -280,6 +280,7 @@
       document.getElementById('login-screen').style.display = 'flex';
     }
 
+    // BUSCADOR USANDO GOOGLE BOOKS API (Con páginas y sinopsis completas)
     async function searchBook() {
       const query = document.getElementById('api-search-input').value.trim();
       const dropdown = document.getElementById('results-dropdown');
@@ -289,23 +290,24 @@
       dropdown.innerHTML = '<div class="result-item">Buscando libros...</div>';
 
       try {
-        const response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`);
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=8`);
         const data = await response.json();
         dropdown.innerHTML = '';
 
-        if (!data.docs || data.docs.length === 0) {
+        if (!data.items || data.items.length === 0) {
           dropdown.innerHTML = '<div class="result-item">No se encontraron resultados. Intenta otro término.</div>';
           return;
         }
 
-        data.docs.forEach(book => {
-          const title = book.title || 'Sin título';
-          const author = book.author_name ? book.author_name.join(', ') : 'Autor desconocido';
+        data.items.forEach(item => {
+          const info = item.volumeInfo;
+          const title = info.title || 'Sin título';
+          const author = info.authors ? info.authors.join(', ') : 'Autor desconocido';
           
           const resultDiv = document.createElement('div');
           resultDiv.className = 'result-item';
           resultDiv.innerText = `${title} — ${author}`;
-          resultDiv.onclick = () => selectBook(book);
+          resultDiv.onclick = () => selectBook(info);
           dropdown.appendChild(resultDiv);
         });
       } catch (e) {
@@ -313,54 +315,30 @@
       }
     }
 
-    async function selectBook(book) {
-      document.getElementById('title').value = book.title || '';
-      document.getElementById('author').value = book.author_name ? book.author_name[0] : '';
+    function selectBook(info) {
+      document.getElementById('title').value = info.title || '';
+      document.getElementById('author').value = info.authors ? info.authors[0] : '';
       
+      // Número de páginas exacto
+      document.getElementById('pages').value = info.pageCount || '';
+
+      // Género
       let genre = 'Romance';
-      if (book.subject && book.subject.length > 0) {
-        const cleanSubject = book.subject.find(s => 
-          !s.toLowerCase().includes('protected') && 
-          !s.toLowerCase().includes('accessible') &&
-          !s.toLowerCase().includes('borrow')
-        ) || book.subject[0];
-        genre = cleanSubject.split(',')[0].trim();
+      if (info.categories && info.categories.length > 0) {
+        genre = info.categories[0].split('/')[0].replace('Fiction', 'Ficción').trim();
       }
       document.getElementById('genre').value = genre;
 
+      // Portada en alta resolución
       let coverUrl = 'https://via.placeholder.com/300x400/eeeeee/1f3b7d?text=Sin+Portada';
-      if (book.cover_i) {
-        coverUrl = `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`;
+      if (info.imageLinks) {
+        coverUrl = info.imageLinks.thumbnail || info.imageLinks.smallThumbnail || coverUrl;
+        coverUrl = coverUrl.replace('http://', 'https://');
       }
       document.getElementById('cover-url').value = coverUrl;
 
-      // Páginas
-      let pages = book.number_of_pages_median || book.number_of_pages || '';
-      if (!pages && book.edition_key && book.edition_key.length > 0) {
-        try {
-          const edKey = book.edition_key[0];
-          const res = await fetch(`https://openlibrary.org/api/books?bibkeys=OLID:${edKey}&format=json&jscmd=data`);
-          const edData = await res.json();
-          if (edData[`OLID:${edKey}`] && edData[`OLID:${edKey}`].number_of_pages) {
-            pages = edData[`OLID:${edKey}`].number_of_pages;
-          }
-        } catch(e) {}
-      }
-      document.getElementById('pages').value = pages;
-
-      // Obtener Sinopsis de la obra
-      let synopsis = 'Sin sinopsis disponible.';
-      if (book.key) {
-        try {
-          const workRes = await fetch(`https://openlibrary.org${book.key}.json`);
-          const workData = await workRes.json();
-          if (workData.description) {
-            synopsis = typeof workData.description === 'string' 
-              ? workData.description 
-              : (workData.description.value || synopsis);
-          }
-        } catch(e) {}
-      }
+      // Sinopsis limpia sin "undefined"
+      let synopsis = info.description ? info.description.replace(/<[^>]*>?/gm, '') : 'Sin sinopsis disponible para este libro.';
       document.getElementById('synopsis-hidden').value = synopsis;
 
       document.getElementById('results-dropdown').style.display = 'none';
@@ -379,7 +357,7 @@
         month: document.getElementById('read-month').value,
         year: document.getElementById('read-year').value,
         cover: document.getElementById('cover-url').value || 'https://via.placeholder.com/300x400/eeeeee/1f3b7d?text=Sin+Portada',
-        synopsis: document.getElementById('synopsis-hidden').value || 'Sin sinopsis disponible.'
+        synopsis: document.getElementById('synopsis-hidden').value || 'Sin sinopsis disponible para este libro.'
       };
 
       books.push(newBook);
@@ -415,7 +393,7 @@
               <span class="badge badge-genre">${book.genre}</span>
             </div>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">
-              ${book.pages ? book.pages + ' páginas' : ''} ${dateText !== '-' ? '• Leído en: ' + dateText : ''}
+              ${book.pages ? book.pages + ' páginas' : 'Páginas no especificadas'} ${dateText !== '-' ? '• Leído en: ' + dateText : ''}
             </p>
           </div>
         </div>
