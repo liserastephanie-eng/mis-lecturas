@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Book Tracker</title>
+  
+  <!-- Importando tipografías de Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Montserrat (fina para títulos) y Poppins (redonda para texto) -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Paleta Memphis inspirada en la imagen */
+      --memphis-turquoise: #59dcd2;
+      --memphis-pink: #ffb1df;
+      --memphis-yellow: #ffec64;
+      --memphis-navy: #1f3b7d;
+      --memphis-white: #ffffff;
+      
+      /* Asignación de colores estructurales */
+      --bg: #fdfdfd;
+      --card-bg: var(--memphis-white);
+      --text-main: var(--memphis-navy);
+      --text-muted: #66759c; /* Un navy más claro */
+      --border: var(--text-main); /* Bordes oscuros para marcar el contraste Memphis */
+      
+      /* Tipografías */
+      --font-title: 'Montserrat', sans-serif;
+      --font-body: 'Poppins', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body { 
+      font-family: var(--font-body); 
+      background-color: var(--bg); 
+      color: var(--text-main); 
+      padding: 40px 20px; 
+      line-height: 1.6;
+      /* Patrón sutil de fondo opcional estilo Memphis */
+      background-image: radial-gradient(var(--memphis-turquoise) 1px, transparent 1px);
+      background-size: 20px 20px;
+      background-color: #faf9f6;
+    }
+    
+    .container { max-width: 1000px; margin: 0 auto; background: var(--bg); padding: 30px; border-radius: 20px; border: 2px solid var(--border); box-shadow: 10px 10px 0px var(--memphis-turquoise); }
+    
+    /* Tipografía de Títulos */
+    header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid var(--border); }
+    header h1 { 
+      font-family: var(--font-title); 
+      font-size: 3.5rem; 
+      font-weight: 200; /* Letra muy fina */
+      text-transform: uppercase; 
+      letter-spacing: 0.1em; 
+      color: var(--memphis-navy);
+      margin-bottom: 5px;
+    }
+    header p {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    /* Dashboard KPIs */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .kpi-card { 
+      background: var(--card-bg); 
+      padding: 24px; 
+      border-radius: 0px; /* Estilo más geométrico */
+      border: 2px solid var(--border); 
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    /* Colores alternos para las tarjetas KPI */
+    .kpi-card:nth-child(1) { box-shadow: 6px 6px 0px var(--memphis-pink); }
+    .kpi-card:nth-child(2) { box-shadow: 6px 6px 0px var(--memphis-yellow); }
+    .kpi-card:nth-child(3) { box-shadow: 6px 6px 0px var(--memphis-turquoise); }
+    .kpi-card:nth-child(4) { box-shadow: 6px 6px 0px var(--memphis-navy); }
+    
+    .kpi-card:hover { transform: translate(-2px, -2px); }
+    
+    .kpi-card p { font-size: 0.8rem; font-weight: 500; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+    .kpi-card span { 
+      font-family: var(--font-title); 
+      font-size: 2.5rem; 
+      font-weight: 300; 
+      color: var(--memphis-navy); 
+      display: block; 
+    }
+
+    /* Secciones */
+    .section-title { 
+      font-family: var(--font-title); 
+      font-size: 2rem; 
+      font-weight: 200; 
+      text-transform: uppercase;
+      margin-bottom: 24px; 
+      color: var(--memphis-navy);
+    }
+    
+    .card { 
+      background: var(--card-bg); 
+      padding: 30px; 
+      border: 2px solid var(--border); 
+      margin-bottom: 40px; 
+      box-shadow: 8px 8px 0px var(--memphis-yellow);
+    }
+
+    /* Buscador y Formulario */
+    .search-box { display: flex; gap: 12px; margin-bottom: 20px; }
+    input, select, button { 
+      font-family: var(--font-body); 
+      font-size: 0.95rem; 
+      padding: 14px 18px; 
+      border: 2px solid var(--border); 
+      outline: none; 
+      background: var(--memphis-white);
+    }
+    input:focus, select:focus { background: #f0f4ff; }
+    input { flex: 1; }
+    
+    .btn-primary { 
+      background: var(--memphis-pink); 
+      color: var(--memphis-navy); 
+      font-weight: 600; 
+      cursor: pointer; 
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { 
+      background: var(--memphis-navy);
+      color: var(--memphis-pink);
+    }
+    
+    .results-dropdown { max-height: 200px; overflow-y: auto; background: var(--card-bg); border: 2px solid var(--border); margin-bottom: 20px; display: none; }
+    .result-item { padding: 12px 18px; cursor: pointer; border-bottom: 2px solid var(--border); font-size: 0.9rem; }
+    .result-item:hover { background: var(--memphis-yellow); }
+    .result-item:last-child { border-bottom: none; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+    .form-group-full { grid-column: 1 / -1; margin-top: 10px; }
+
+    /* Pestañas de Filtrado */
+    .tabs { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
+    .tab-btn { 
+      background: transparent; 
+      border: 2px solid transparent; 
+      font-weight: 500; 
+      color: var(--text-muted); 
+      cursor: pointer; 
+      padding: 8px 20px; 
+      border-radius: 20px;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+    .tab-btn:hover { color: var(--memphis-navy); border-color: var(--border); }
+    .tab-btn.active { 
+      background: var(--memphis-navy); 
+      color: var(--memphis-white); 
+      border-color: var(--memphis-navy);
+    }
+
+    /* Cuadrícula de Libros */
+    .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; }
+    .book-card { 
+      background: var(--card-bg); 
+      padding: 16px; 
+      border: 2px solid var(--border); 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
+      transition: all 0.2s;
+      box-shadow: 6px 6px 0px var(--memphis-turquoise);
+    }
+    .book-card:nth-child(even) { box-shadow: 6px 6px 0px var(--memphis-pink); }
+    .book-card:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0px var(--memphis-yellow) !important; }
+    
+    .cover-img { width: 100%; height: 320px; object-fit: cover; border: 2px solid var(--border); margin-bottom: 16px; background: #eee; }
+    
+    .book-title { 
+      font-family: var(--font-title); 
+      font-size: 1.4rem; 
+      font-weight: 300; 
+      margin-bottom: 8px; 
+      line-height: 1.2; 
+      color: var(--memphis-navy);
+    }
+    .book-author { font-size: 0.9rem; font-weight: 500; color: var(--text-main); margin-bottom: 16px; }
+    
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    
+    /* Badges estilo Memphis */
+    .badge { font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border: 2px solid var(--border); text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge-status-por-leer { background: var(--memphis-yellow); }
+    .badge-status-leyendo { background: var(--memphis-pink); }
+    .badge-status-completado { background: var(--memphis-turquoise); }
+    .badge-genre { background: var(--memphis-white); }
+    
+    .book-meta { font-size: 0.85rem; color: var(--text-muted); border-top: 2px dashed var(--border); padding-top: 12px; margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
+    .meta-info { display: flex; flex-direction: column; gap: 4px;}
+    
+    .delete-btn { 
+      background: var(--memphis-navy); 
+      color: var(--memphis-white); 
+      border: none; 
+      font-size: 0.75rem; 
+      font-weight: 600; 
+      cursor: pointer; 
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+    .delete-btn:hover { background: #ef4444; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Mi Biblioteca</h1>
+      <p>Tracker de lecturas</p>
+    </header>
+
+    <!-- Dashboard KPI -->
+    <div class="kpi-grid">
+      <div class="kpi-card"><p>Leídos este Año</p><span id="kpi-year">0</span></div>
+      <div class="kpi-card"><p>Leídos este Mes</p><span id="kpi-month">0</span></div>
+      <div class="kpi-card"><p>Total Páginas</p><span id="kpi-pages">0</span></div>
+      <div class="kpi-card"><p>Género Top</p><span id="kpi-genre" style="font-size: 1.2rem; margin-top: 18px; font-weight: 500; font-family: var(--font-body);">Ninguno</span></div>
+    </div>
+
+    <!-- Buscador e Inserción -->
+    <div class="card">
+      <h2 class="section-title">Añadir Libro</h2>
+      <div class="search-box">
+        <input type="text" id="api-search-input" placeholder="Buscar título o autor...">
+        <button class="btn-primary" onclick="searchBook()">Buscar</button>
+      </div>
+      <div id="results-dropdown" class="results-dropdown"></div>
+
+      <form id="book-form">
+        <div class="form-grid">
+          <input type="text" id="title" placeholder="Título" required>
+          <input type="text" id="author" placeholder="Autor" required>
+          <input type="text" id="genre" placeholder="Género">
+          <input type="number" id="pages" placeholder="Páginas">
+          <select id="status">
+            <option value="Por leer">Por leer</option>
+            <option value="Leyendo">Leyendo</option>
+            <option value="Completado">Completado</option>
+          </select>
+          <select id="read-month">
+            <option value="">Mes de lectura</option>
+            <option value="01">Enero</option><option value="02">Febrero</option>
+            <option value="03">Marzo</option><option value="04">Abril</option>
+            <option value="05">Mayo</option><option value="06">Junio</option>
+            <option value="07">Julio</option><option value="08">Agosto</option>
+            <option value="09">Septiembre</option><option value="10">Octubre</option>
+            <option value="11">Noviembre</option><option value="12">Diciembre</option>
+          </select>
+          <input type="number" id="read-year" placeholder="Año (ej. 2026)" min="1900" max="2099">
+          <input type="hidden" id="cover-url">
+          <button type="submit" class="btn-primary form-group-full">Guardar Libro</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Listado con Pestañas -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="filterBooks('Todos', this)">Todos</button>
+      <button class="tab-btn" onclick="filterBooks('Por leer', this)">Por leer</button>
+      <button class="tab-btn" onclick="filterBooks('Leyendo', this)">Leyendo</button>
+      <button class="tab-btn" onclick="filterBooks('Completado', this)">Completados</button>
+    </div>
+
+    <div class="books-grid" id="books-grid"></div>
+  </div>
+
+  <script>
+    let books = JSON.parse(localStorage.getItem('myBooksData')) || [];
+    let currentFilter = 'Todos';
+
+    // Búsqueda en Open Library API
+    async function searchBook() {
+      const query = document.getElementById('api-search-input').value;
+      const dropdown = document.getElementById('results-dropdown');
+      if (!query) return;
+
+      dropdown.style.display = 'block';
+      dropdown.innerHTML = '<div class="result-item">Buscando...</div>';
+
+      try {
+        const response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=5`);
+        const data = await response.json();
+        dropdown.innerHTML = '';
+
+        if (data.docs.length === 0) {
+          dropdown.innerHTML = '<div class="result-item">No se encontraron resultados</div>';
+          return;
+        }
+
+        data.docs.forEach(book => {
+          const item = document.createElement('div');
+          item.className = 'result-item';
+          const author = book.author_name ? book.author_name[0] : 'Desconocido';
+          item.innerText = `${book.title} — ${author}`;
+          item.onclick = () => selectBook(book);
+          dropdown.appendChild(item);
+        });
+      } catch (e) {
+        dropdown.innerHTML = '<div class="result-item">Error al buscar información</div>';
+      }
+    }
+
+    function selectBook(book) {
+      document.getElementById('title').value = book.title || '';
+      document.getElementById('author').value = book.author_name ? book.author_name[0] : '';
+      document.getElementById('pages').value = book.number_of_pages_median || book.number_of_pages || '';
+      document.getElementById('genre').value = book.subject ? book.subject[0] : 'General';
+      
+      const coverUrl = book.cover_i 
+        ? `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg` 
+        : 'https://via.placeholder.com/300x400/eeeeee/1f3b7d?text=Sin+Portada';
+      document.getElementById('cover-url').value = coverUrl;
+
+      document.getElementById('results-dropdown').style.display = 'none';
+      document.getElementById('api-search-input').value = '';
+    }
+
+    // Formularios e Interacción
+    document.getElementById('book-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newBook = {
+        id: Date.now(),
+        title: document.getElementById('title').value,
+        author: document.getElementById('author').value,
+        genre: document.getElementById('genre').value || 'Sin género',
+        pages: parseInt(document.getElementById('pages').value) || 0,
+        status: document.getElementById('status').value,
+        month: document.getElementById('read-month').value,
+        year: document.getElementById('read-year').value,
+        cover: document.getElementById('cover-url').value || 'https://via.placeholder.com/300x400/eeeeee/1f3b7d?text=Sin+Portada'
+      };
+
+      books.push(newBook);
+      saveAndRender();
+      document.getElementById('book-form').reset();
+      document.getElementById('cover-url').value = '';
+    });
+
+    function deleteBook(id) {
+      books = books.filter(b => b.id !== id);
+      saveAndRender();
+    }
+
+    function filterBooks(status, btn) {
+      currentFilter = status;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderBooks();
+    }
+
+    function saveAndRender() {
+      localStorage.setItem('myBooksData', JSON.stringify(books));
+      renderBooks();
+      updateDashboard();
+    }
+
+    function updateDashboard() {
+      const currentYear = new Date().getFullYear().toString();
+      const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+
+      const completed = books.filter(b => b.status === 'Completado');
+      
+      const yearCount = completed.filter(b => b.year === currentYear).length;
+      const monthCount = completed.filter(b => b.year === currentYear && b.month === currentMonth).length;
+      const totalPages = completed.reduce((acc, b) => acc + (b.pages || 0), 0);
+
+      // Calcular género más leído
+      const genres = {};
+      completed.forEach(b => { if(b.genre && b.genre !== 'Sin género') genres[b.genre] = (genres[b.genre] || 0) + 1; });
+      const topGenre = Object.keys(genres).length > 0 ? Object.keys(genres).reduce((a, b) => genres[a] > genres[b] ? a : b) : 'Ninguno';
+
+      document.getElementById('kpi-year').innerText = yearCount;
+      document.getElementById('kpi-month').innerText = monthCount;
+      document.getElementById('kpi-pages').innerText = totalPages.toLocaleString();
+      document.getElementById('kpi-genre').innerText = topGenre;
+    }
+
+    function renderBooks() {
+      const grid = document.getElementById('books-grid');
+      grid.innerHTML = '';
+
+      const filtered = currentFilter === 'Todos' ? books : books.filter(b => b.status === currentFilter);
+
+      filtered.forEach(book => {
+        const card = document.createElement('div');
+        card.className = 'book-card';
+        
+        const statusSlug = book.status.toLowerCase().replace(/\s+/g, '-');
+        const dateText = (book.month && book.year) ? `${book.month}/${book.year}` : '-';
+
+        card.innerHTML = `
+          <div>
+            <img src="${book.cover}" class="cover-img" alt="Portada" onerror="this.src='https://via.placeholder.com/300x400/eeeeee/1f3b7d?text=Sin+Portada'">
+            <div class="badges">
+              <span class="badge badge-status-${statusSlug}">${book.status}</span>
+              <span class="badge badge-genre">${book.genre}</span>
+            </div>
+            <h3 class="book-title">${book.title}</h3>
+            <p class="book-author">${book.author}</p>
+          </div>
+          <div class="book-meta">
+            <div class="meta-info">
+              <span>${book.pages ? book.pages + ' págs.' : ''}</span>
+              <span>${dateText !== '-' ? 'Leído: ' + dateText : ''}</span>
+            </div>
+            <button class="delete-btn" onclick="deleteBook(${book.id})">Borrar</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Inicializar
+    saveAndRender();
+  </script>
+</body>
+</html>
