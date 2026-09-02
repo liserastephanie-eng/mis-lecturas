@@ -38,6 +38,7 @@
       background-size: 20px 20px;
     }
 
+    /* Pantalla de Login */
     #login-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
       background-color: var(--bg);
@@ -65,7 +66,7 @@
     .modal-card {
       background: var(--card-bg); border: 2px solid var(--border);
       box-shadow: 10px 10px 0px var(--memphis-yellow);
-      border-radius: 20px; padding: 30px; max-width: 600px; width: 100%;
+      border-radius: 20px; padding: 30px; max-width: 650px; width: 100%;
       max-height: 90vh; overflow-y: auto; position: relative;
     }
     .close-modal-btn {
@@ -79,14 +80,14 @@
     .modal-info { flex: 1; min-width: 200px; }
     .modal-title { font-family: var(--font-title); font-size: 1.5rem; font-weight: 600; line-height: 1.2; margin-bottom: 6px; }
     .modal-author { font-size: 0.95rem; font-weight: 500; color: var(--text-muted); margin-bottom: 12px; }
-    .synopsis-text { margin-top: 16px; font-size: 0.88rem; line-height: 1.6; color: var(--text-main); padding-right: 8px; border-top: 2px dashed var(--border); padding-top: 12px; max-height: 200px; overflow-y: auto; }
+    .synopsis-text { margin-top: 16px; font-size: 0.88rem; line-height: 1.6; color: var(--text-main); padding-right: 8px; border-top: 2px dashed var(--border); padding-top: 12px; max-height: 180px; overflow-y: auto; }
     
     /* Controles de edición en Modal */
     .edit-controls { margin-top: 20px; padding-top: 16px; border-top: 2px solid var(--border); background: #f8fafc; padding: 16px; border-radius: 12px;}
     .edit-controls h4 { margin-bottom: 12px; font-size: 0.95rem; color: var(--memphis-navy); text-transform: uppercase; letter-spacing: 0.05em;}
-    .edit-flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center;}
-    .edit-select { font-family: var(--font-body); font-size: 0.85rem; padding: 8px 12px; border: 2px solid var(--border); border-radius: 8px; background: white;}
-    .btn-update { background: var(--memphis-turquoise); color: var(--memphis-navy); font-weight: 600; padding: 8px 16px; border: 2px solid var(--border); cursor: pointer; text-transform: uppercase; font-size: 0.8rem; border-radius: 8px; transition: all 0.2s; }
+    .edit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px;}
+    .edit-input { font-family: var(--font-body); font-size: 0.85rem; padding: 8px 12px; border: 2px solid var(--border); border-radius: 8px; background: white;}
+    .btn-update { background: var(--memphis-turquoise); color: var(--memphis-navy); font-weight: 600; padding: 10px 16px; border: 2px solid var(--border); cursor: pointer; text-transform: uppercase; font-size: 0.8rem; border-radius: 8px; transition: all 0.2s; width: 100%; }
     .btn-update:hover { background: var(--memphis-navy); color: white; }
 
     #app-content { display: none; padding: 40px 20px; }
@@ -128,12 +129,22 @@
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px; }
     .form-group-full { grid-column: 1 / -1; margin-top: 10px; }
 
-    .tabs { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
-    .tab-btn { background: transparent; border: 2px solid transparent; font-weight: 500; color: var(--text-muted); cursor: pointer; padding: 8px 20px; border-radius: 20px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; }
+    /* Barra de navegación con Filtros y Ordenamiento */
+    .controls-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
+    .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tab-btn { background: transparent; border: 2px solid transparent; font-weight: 500; color: var(--text-muted); cursor: pointer; padding: 8px 16px; border-radius: 20px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; }
     .tab-btn:hover { color: var(--memphis-navy); border-color: var(--border); }
     .tab-btn.active { background: var(--memphis-navy); color: var(--memphis-white); border-color: var(--memphis-navy); }
 
-    /* TARJETAS COMPACTAS */
+    .sort-box { display: flex; align-items: center; gap: 8px; }
+    .sort-box label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }
+    .sort-select { font-size: 0.8rem; padding: 6px 12px; border: 2px solid var(--border); border-radius: 8px; background: white; cursor: pointer; }
+
+    /* Vista por Carpetas/Sagas */
+    .saga-folder { background: #f1f5f9; border: 2px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 6px 6px 0px var(--memphis-yellow); }
+    .saga-title { font-family: var(--font-title); font-size: 1.3rem; font-weight: 600; color: var(--memphis-navy); margin-bottom: 16px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+
+    /* Tarjetas Compactas */
     .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; }
     .book-card { 
       background: var(--card-bg); padding: 12px; border: 2px solid var(--border); border-radius: 12px;
@@ -154,6 +165,7 @@
     .badge-status-leyendo { background: var(--memphis-pink); }
     .badge-status-completado { background: var(--memphis-turquoise); }
     .badge-genre { background: var(--memphis-white); }
+    .badge-saga { background: var(--memphis-pink); color: var(--memphis-navy); }
     
     .book-meta { font-size: 0.75rem; color: var(--text-muted); border-top: 1px dashed var(--border); padding-top: 8px; margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
     
@@ -208,6 +220,7 @@
           <div class="form-grid">
             <input type="text" id="title" placeholder="Título" required>
             <input type="text" id="author" placeholder="Autor" required>
+            <input type="text" id="saga" placeholder="Saga / Serie (Opcional)">
             <input type="text" id="genre" placeholder="Género">
             <input type="number" id="pages" placeholder="Páginas">
             <select id="status">
@@ -232,14 +245,27 @@
         </form>
       </div>
 
-      <div class="tabs">
-        <button class="tab-btn active" onclick="filterBooks('Todos', this)">Todos</button>
-        <button class="tab-btn" onclick="filterBooks('Por leer', this)">Por leer</button>
-        <button class="tab-btn" onclick="filterBooks('Leyendo', this)">Leyendo</button>
-        <button class="tab-btn" onclick="filterBooks('Completado', this)">Completados</button>
+      <!-- Barra de navegación con Sagas y Ordenamiento -->
+      <div class="controls-bar">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="filterBooks('Todos', this)">Todos</button>
+          <button class="tab-btn" onclick="filterBooks('Por leer', this)">Por leer</button>
+          <button class="tab-btn" onclick="filterBooks('Leyendo', this)">Leyendo</button>
+          <button class="tab-btn" onclick="filterBooks('Completado', this)">Completados</button>
+          <button class="tab-btn" onclick="filterBooks('Sagas', this)">📁 Sagas</button>
+        </div>
+
+        <div class="sort-box">
+          <label for="sort-select">Ordenar:</label>
+          <select id="sort-select" class="sort-select" onchange="renderBooks()">
+            <option value="newest">Más recientes</option>
+            <option value="oldest">Más antiguos</option>
+            <option value="title">Por Título (A-Z)</option>
+          </select>
+        </div>
       </div>
 
-      <div class="books-grid" id="books-grid"></div>
+      <div id="books-container"></div>
     </div>
   </div>
 
@@ -319,6 +345,11 @@
       document.getElementById('title').value = title;
       document.getElementById('author').value = author;
       
+      // Intentar adivinar la saga desde el título
+      if (title.includes(':')) {
+        document.getElementById('saga').value = title.split(':')[0].trim();
+      }
+
       let genre = 'Ficción';
       if (book.subject && book.subject.length > 0) {
         const cleanSubject = book.subject.find(s => 
@@ -368,6 +399,7 @@
         id: Date.now(),
         title: document.getElementById('title').value,
         author: document.getElementById('author').value,
+        saga: document.getElementById('saga').value.trim(),
         genre: document.getElementById('genre').value || 'Sin género',
         pages: parseInt(document.getElementById('pages').value) || 0,
         status: document.getElementById('status').value,
@@ -390,7 +422,7 @@
       saveAndRender();
     }
 
-    // Modal con opción de edición
+    // Modal con Edición Completa de Datos (Páginas, Sinopsis, Saga, Estado)
     function openModal(id) {
       const book = books.find(b => b.id === id);
       if (!book) return;
@@ -399,7 +431,6 @@
       const statusSlug = book.status.toLowerCase().replace(/\s+/g, '-');
       const dateText = (book.month && book.year) ? `${book.month}/${book.year}` : '-';
 
-      // Construcción del modal con los controles de actualización
       modalContent.innerHTML = `
         <div class="modal-body">
           <img src="${book.cover}" class="modal-cover" alt="Portada" onerror="this.src='https://via.placeholder.com/300x400/eeeeee/1f3b7d?text=Sin+Portada'">
@@ -409,6 +440,7 @@
             <div class="badges">
               <span class="badge badge-status-${statusSlug}">${book.status}</span>
               <span class="badge badge-genre">${book.genre}</span>
+              ${book.saga ? `<span class="badge badge-saga">📁 ${book.saga}</span>` : ''}
             </div>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">
               ${book.pages ? book.pages + ' páginas' : 'Páginas no especificadas'} ${dateText !== '-' ? '• Leído en: ' + dateText : ''}
@@ -422,63 +454,71 @@
         </div>
 
         <div class="edit-controls">
-          <h4>Actualizar Progreso</h4>
-          <div class="edit-flex">
-            <select id="edit-status-${book.id}" class="edit-select" onchange="toggleDateFields(${book.id})">
-              <option value="Por leer" ${book.status === 'Por leer' ? 'selected' : ''}>Por leer</option>
-              <option value="Leyendo" ${book.status === 'Leyendo' ? 'selected' : ''}>Leyendo</option>
-              <option value="Completado" ${book.status === 'Completado' ? 'selected' : ''}>Completado</option>
-            </select>
-            
-            <div id="edit-date-fields-${book.id}" style="display: ${book.status === 'Completado' ? 'flex' : 'none'}; gap: 10px;">
-              <select id="edit-month-${book.id}" class="edit-select">
-                <option value="">Mes</option>
-                <option value="01" ${book.month === '01' ? 'selected' : ''}>Enero</option>
-                <option value="02" ${book.month === '02' ? 'selected' : ''}>Feb</option>
-                <option value="03" ${book.month === '03' ? 'selected' : ''}>Mar</option>
-                <option value="04" ${book.month === '04' ? 'selected' : ''}>Abr</option>
-                <option value="05" ${book.month === '05' ? 'selected' : ''}>May</option>
-                <option value="06" ${book.month === '06' ? 'selected' : ''}>Jun</option>
-                <option value="07" ${book.month === '07' ? 'selected' : ''}>Jul</option>
-                <option value="08" ${book.month === '08' ? 'selected' : ''}>Ago</option>
-                <option value="09" ${book.month === '09' ? 'selected' : ''}>Sep</option>
-                <option value="10" ${book.month === '10' ? 'selected' : ''}>Oct</option>
-                <option value="11" ${book.month === '11' ? 'selected' : ''}>Nov</option>
-                <option value="12" ${book.month === '12' ? 'selected' : ''}>Dic</option>
+          <h4>Editar Detalles y Progreso</h4>
+          <div class="edit-grid">
+            <div>
+              <label style="font-size:0.75rem; font-weight:600;">Estado:</label>
+              <select id="edit-status-${book.id}" class="edit-input" style="width:100%;" onchange="toggleDateFields(${book.id})">
+                <option value="Por leer" ${book.status === 'Por leer' ? 'selected' : ''}>Por leer</option>
+                <option value="Leyendo" ${book.status === 'Leyendo' ? 'selected' : ''}>Leyendo</option>
+                <option value="Completado" ${book.status === 'Completado' ? 'selected' : ''}>Completado</option>
               </select>
-              <input type="number" id="edit-year-${book.id}" class="edit-select" style="width: 80px;" placeholder="Año" value="${book.year || new Date().getFullYear()}">
             </div>
 
-            <button class="btn-update" onclick="updateBookStatus(${book.id})">Guardar cambios</button>
+            <div>
+              <label style="font-size:0.75rem; font-weight:600;">Saga / Serie:</label>
+              <input type="text" id="edit-saga-${book.id}" class="edit-input" style="width:100%;" value="${book.saga || ''}" placeholder="Ej: Legacy of Gods">
+            </div>
+
+            <div>
+              <label style="font-size:0.75rem; font-weight:600;">Páginas:</label>
+              <input type="number" id="edit-pages-${book.id}" class="edit-input" style="width:100%;" value="${book.pages || ''}" placeholder="Páginas">
+            </div>
           </div>
+
+          <div id="edit-date-fields-${book.id}" style="display: ${book.status === 'Completado' ? 'flex' : 'none'}; gap: 10px; margin-bottom:12px;">
+            <select id="edit-month-${book.id}" class="edit-input" style="flex:1;">
+              <option value="">Mes de lectura</option>
+              <option value="01" ${book.month === '01' ? 'selected' : ''}>Enero</option>
+              <option value="02" ${book.month === '02' ? 'selected' : ''}>Febrero</option>
+              <option value="03" ${book.month === '03' ? 'selected' : ''}>Marzo</option>
+              <option value="04" ${book.month === '04' ? 'selected' : ''}>Abril</option>
+              <option value="05" ${book.month === '05' ? 'selected' : ''}>Mayo</option>
+              <option value="06" ${book.month === '06' ? 'selected' : ''}>Junio</option>
+              <option value="07" ${book.month === '07' ? 'selected' : ''}>Julio</option>
+              <option value="08" ${book.month === '08' ? 'selected' : ''}>Agosto</option>
+              <option value="09" ${book.month === '09' ? 'selected' : ''}>Septiembre</option>
+              <option value="10" ${book.month === '10' ? 'selected' : ''}>Octubre</option>
+              <option value="11" ${book.month === '11' ? 'selected' : ''}>Noviembre</option>
+              <option value="12" ${book.month === '12' ? 'selected' : ''}>Diciembre</option>
+            </select>
+            <input type="number" id="edit-year-${book.id}" class="edit-input" style="width: 100px;" placeholder="Año" value="${book.year || new Date().getFullYear()}">
+          </div>
+
+          <button class="btn-update" onclick="updateBookStatus(${book.id})">Guardar cambios</button>
         </div>
       `;
       document.getElementById('modal-screen').style.display = 'flex';
     }
 
-    // Muestra u oculta los campos de fecha si se selecciona "Completado" en el modal
     function toggleDateFields(id) {
       const status = document.getElementById(`edit-status-${id}`).value;
       const dateFields = document.getElementById(`edit-date-fields-${id}`);
-      if (status === 'Completado') {
-        dateFields.style.display = 'flex';
-      } else {
-        dateFields.style.display = 'none';
-      }
+      dateFields.style.display = status === 'Completado' ? 'flex' : 'none';
     }
 
-    // Actualiza el libro con los nuevos datos ingresados en el modal
     function updateBookStatus(id) {
       const bookIndex = books.findIndex(b => b.id === id);
       if (bookIndex !== -1) {
         const newStatus = document.getElementById(`edit-status-${id}`).value;
         books[bookIndex].status = newStatus;
+        books[bookIndex].saga = document.getElementById(`edit-saga-${id}`).value.trim();
+        books[bookIndex].pages = parseInt(document.getElementById(`edit-pages-${id}`).value) || 0;
         
         if (newStatus === 'Completado') {
           books[bookIndex].month = document.getElementById(`edit-month-${id}`).value;
           books[bookIndex].year = document.getElementById(`edit-year-${id}`).value;
         } else {
-          // Si vuelve a "Por leer" o "Leyendo", borramos la fecha finalización
           books[bookIndex].month = "";
           books[bookIndex].year = "";
         }
@@ -529,21 +569,30 @@
       document.getElementById('kpi-genre').innerText = topGenre;
     }
 
-    function renderBooks() {
-      const grid = document.getElementById('books-grid');
-      grid.innerHTML = '';
+    // Algoritmo de Ordenamiento
+    function getSortedBooks(list) {
+      const sortType = document.getElementById('sort-select').value;
+      return [...list].sort((a, b) => {
+        if (sortType === 'newest') {
+          const dateA = (a.year && a.month) ? `${a.year}${a.month}` : `${a.id}`;
+          const dateB = (b.year && b.month) ? `${b.year}${b.month}` : `${b.id}`;
+          return dateB.localeCompare(dateA);
+        } else if (sortType === 'oldest') {
+          const dateA = (a.year && a.month) ? `${a.year}${a.month}` : `${a.id}`;
+          const dateB = (b.year && b.month) ? `${b.year}${b.month}` : `${b.id}`;
+          return dateA.localeCompare(dateB);
+        } else if (sortType === 'title') {
+          return a.title.localeCompare(b.title);
+        }
+      });
+    }
 
-      const filtered = currentFilter === 'Todos' ? books : books.filter(b => b.status === currentFilter);
+    function createBookCardHtml(book) {
+      const statusSlug = book.status.toLowerCase().replace(/\s+/g, '-');
+      const dateText = (book.month && book.year) ? `${book.month}/${book.year}` : '-';
 
-      filtered.forEach(book => {
-        const card = document.createElement('div');
-        card.className = 'book-card';
-        card.onclick = () => openModal(book.id);
-        
-        const statusSlug = book.status.toLowerCase().replace(/\s+/g, '-');
-        const dateText = (book.month && book.year) ? `${book.month}/${book.year}` : '-';
-
-        card.innerHTML = `
+      return `
+        <div class="book-card" onclick="openModal(${book.id})">
           <div>
             <img src="${book.cover}" class="cover-img" alt="Portada" onerror="this.src='https://via.placeholder.com/300x400/eeeeee/1f3b7d?text=Sin+Portada'">
             <div class="badges">
@@ -557,9 +606,70 @@
             <span>${dateText !== '-' ? 'Leído: ' + dateText : ''}</span>
             <button class="delete-btn" onclick="deleteBook(${book.id}, event)">Borrar</button>
           </div>
-        `;
-        grid.appendChild(card);
-      });
+        </div>
+      `;
+    }
+
+    function renderBooks() {
+      const container = document.getElementById('books-container');
+      container.innerHTML = '';
+
+      let filtered = currentFilter === 'Todos' ? books : books.filter(b => b.status === currentFilter);
+
+      // VISTA ESPECIAL: POR SAGAS (CARPETAS)
+      if (currentFilter === 'Sagas') {
+        const sagasMap = {};
+        const sinSaga = [];
+
+        books.forEach(book => {
+          if (book.saga) {
+            if (!sagasMap[book.saga]) sagasMap[book.saga] = [];
+            sagasMap[book.saga].push(book);
+          } else {
+            sinSaga.push(book);
+          }
+        });
+
+        // Mostrar carpetas de sagas
+        Object.keys(sagasMap).forEach(sagaName => {
+          const folderDiv = document.createElement('div');
+          folderDiv.className = 'saga-folder';
+          
+          const sortedSagaBooks = getSortedBooks(sagasMap[sagaName]);
+          
+          folderDiv.innerHTML = `
+            <div class="saga-title">📁 Saga: ${sagaName} (${sagasMap[sagaName].length})</div>
+            <div class="books-grid">
+              ${sortedSagaBooks.map(b => createBookCardHtml(b)).join('')}
+            </div>
+          `;
+          container.appendChild(folderDiv);
+        });
+
+        // Libros sueltos sin saga
+        if (sinSaga.length > 0) {
+          const folderDiv = document.createElement('div');
+          folderDiv.className = 'saga-folder';
+          folderDiv.style.background = '#ffffff';
+          
+          const sortedSinSaga = getSortedBooks(sinSaga);
+          folderDiv.innerHTML = `
+            <div class="saga-title">📚 Libros Independientes (${sinSaga.length})</div>
+            <div class="books-grid">
+              ${sortedSinSaga.map(b => createBookCardHtml(b)).join('')}
+            </div>
+          `;
+          container.appendChild(folderDiv);
+        }
+        return;
+      }
+
+      // VISTA NORMAL (CUADRÍCULA)
+      const sortedBooks = getSortedBooks(filtered);
+      const gridDiv = document.createElement('div');
+      gridDiv.className = 'books-grid';
+      gridDiv.innerHTML = sortedBooks.map(b => createBookCardHtml(b)).join('');
+      container.appendChild(gridDiv);
     }
   </script>
 </body>
