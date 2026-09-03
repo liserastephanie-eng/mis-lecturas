@@ -160,13 +160,8 @@
       box-shadow: 4px 4px 0px var(--memphis-yellow); 
       transition: all 0.2s;
     }
+    
     details.saga-folder summary { 
-      font-family: var(--font-title); 
-      font-size: 1.1rem; 
-      font-weight: 600; 
-      letter-spacing: 0.05em;
-      color: var(--memphis-navy); 
-      text-transform: uppercase; 
       display: flex; 
       justify-content: space-between;
       align-items: center; 
@@ -175,6 +170,35 @@
       list-style: none;
     }
     details.saga-folder summary::-webkit-details-marker { display: none; }
+    
+    .saga-summary-content {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .saga-prefix {
+      font-family: var(--font-body); 
+      font-size: 0.95rem; 
+      font-weight: 600; 
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .saga-name-stylized {
+      font-family: var(--font-title); 
+      font-weight: 200; 
+      font-size: 1.8rem; 
+      letter-spacing: 0.1em;
+      color: var(--memphis-navy); 
+      text-transform: uppercase;
+    }
+    .saga-count {
+      font-family: var(--font-body); 
+      font-size: 0.95rem; 
+      font-weight: 600; 
+      color: var(--text-muted); 
+    }
+
     .toggle-icon {
       font-size: 0.8rem;
       background: var(--memphis-pink);
@@ -232,13 +256,14 @@
 
       .search-box { flex-direction: column; }
       .search-box button { width: 100%; }
-
       .form-grid { grid-template-columns: 1fr; }
 
       .controls-bar { flex-direction: column; align-items: stretch; gap: 15px; }
       .tabs { justify-content: center; }
       .sort-box { justify-content: space-between; }
 
+      .saga-name-stylized { font-size: 1.3rem; }
+      
       .books-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
       .cover-img { height: 180px; }
 
@@ -898,13 +923,16 @@
         Object.keys(sagasMap).forEach(sagaName => {
           const folderDiv = document.createElement('details');
           folderDiv.className = 'saga-folder';
-          // Se mantiene plegado por defecto al no asignar folderDiv.open = true;
           
           const sortedSagaBooks = getSortedBooks(sagasMap[sagaName]);
           
           folderDiv.innerHTML = `
             <summary>
-              <span>📁 Saga: ${sagaName} (${sagasMap[sagaName].length})</span>
+              <div class="saga-summary-content">
+                <span class="saga-prefix">📁 Saga:</span>
+                <span class="saga-name-stylized">${sagaName}</span>
+                <span class="saga-count">(${sagasMap[sagaName].length})</span>
+              </div>
               <span class="toggle-icon">▼</span>
             </summary>
             <div class="books-grid" style="margin-top: 14px;">
@@ -917,12 +945,15 @@
         if (sinSaga.length > 0) {
           const folderDiv = document.createElement('details');
           folderDiv.className = 'saga-folder';
-          // Se mantiene plegado por defecto
           
           const sortedSinSaga = getSortedBooks(sinSaga);
           folderDiv.innerHTML = `
             <summary>
-              <span>📚 Libros Independientes (${sinSaga.length})</span>
+              <div class="saga-summary-content">
+                <span class="saga-prefix">📚</span>
+                <span class="saga-name-stylized">Libros Independientes</span>
+                <span class="saga-count">(${sinSaga.length})</span>
+              </div>
               <span class="toggle-icon">▼</span>
             </summary>
             <div class="books-grid" style="margin-top: 14px;">
