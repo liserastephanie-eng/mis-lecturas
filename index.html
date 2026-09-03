@@ -146,6 +146,8 @@
     .tab-btn { background: transparent; border: 2px solid transparent; font-weight: 500; color: var(--text-muted); cursor: pointer; padding: 8px 16px; border-radius: 20px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; }
     .tab-btn:hover { color: var(--memphis-navy); border-color: var(--border); }
     .tab-btn.active { background: var(--memphis-navy); color: var(--memphis-white); border-color: var(--memphis-navy); }
+    .btn-quick-search { font-size: 0.75rem; padding: 6px 12px; border-radius: 6px; text-transform: none; font-weight: 500; border: 2px solid var(--border); background: var(--memphis-white); cursor: pointer; }
+    .btn-quick-search:hover { background: var(--memphis-yellow); }
 
     .sort-box { display: flex; align-items: center; gap: 8px; }
     .sort-box label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }
@@ -186,9 +188,9 @@
     }
     .saga-name-stylized {
       font-family: var(--font-title); 
-      font-weight: 200; 
-      font-size: 1.8rem; 
-      letter-spacing: 0.1em;
+      font-weight: 300; 
+      font-size: 1.3rem; /* TAMAÑO REDUCIDO */
+      letter-spacing: 0.05em;
       color: var(--memphis-navy); 
       text-transform: uppercase;
     }
@@ -262,7 +264,7 @@
       .tabs { justify-content: center; }
       .sort-box { justify-content: space-between; }
 
-      .saga-name-stylized { font-size: 1.3rem; }
+      .saga-name-stylized { font-size: 1.1rem; /* TAMAÑO REDUCIDO EN CELULAR */ }
       
       .books-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
       .cover-img { height: 180px; }
@@ -343,8 +345,17 @@
               <option value="11">Noviembre</option><option value="12">Diciembre</option>
             </select>
             <input type="number" id="read-year" placeholder="Año (ej. 2026)" min="1900" max="2099">
-            <input type="text" id="cover-url" class="form-group-full" placeholder="URL de la Portada (puedes pegar la imagen que quieras)">
+            
+            <div class="form-group-full" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; margin-top: 8px;">
+              <label style="font-size: 0.85rem; font-weight: 600; color: var(--memphis-navy);">Datos manuales (opcional):</label>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn-quick-search" onclick="openWebSearch('goodreads', 'add')">🔍 Buscar en Goodreads</button>
+                <button type="button" class="btn-quick-search" onclick="openWebSearch('google', 'add')">🔍 Buscar en Google</button>
+              </div>
+            </div>
+            <input type="text" id="cover-url" class="form-group-full" placeholder="URL de la Portada (puedes pegar la imagen que quieras)" style="margin-top: 0;">
             <textarea id="synopsis-input" class="form-group-full" placeholder="Sinopsis (se autocompleta o escríbela tú)"></textarea>
+            
             <button type="submit" class="btn-primary form-group-full">Guardar Libro</button>
           </div>
         </form>
@@ -403,6 +414,39 @@
         searchBook();
       }
     });
+
+    // FUNCIÓN PARA BUSCAR EN PESTAÑA NUEVA
+    function openWebSearch(engine, mode, bookId = null) {
+      let title = '';
+      let author = '';
+
+      if (mode === 'add') {
+        title = document.getElementById('title').value;
+        author = document.getElementById('author').value;
+      } else if (mode === 'edit' && bookId) {
+        const book = books.find(b => b.id === bookId);
+        if (book) {
+          title = book.title;
+          author = book.author;
+        }
+      }
+
+      if (!title) {
+        alert("Primero escribe o busca un título para poder buscarlo en internet.");
+        return;
+      }
+
+      const query = encodeURIComponent(`${title} ${author} sinopsis libro`);
+      let url = '';
+      
+      if (engine === 'goodreads') {
+        url = `https://www.goodreads.com/search?q=${encodeURIComponent(title + ' ' + author)}`;
+      } else {
+        url = `https://www.google.com/search?q=${query}`;
+      }
+
+      window.open(url, '_blank');
+    }
 
     function updateSagaDatalist() {
       const datalist = document.getElementById('existing-sagas-list');
@@ -609,8 +653,10 @@
 
     function deleteBook(id, e) {
       if (e) e.stopPropagation();
-      books = books.filter(b => b.id !== id);
-      saveAndRender();
+      if(confirm('¿Estás segura de borrar este libro?')) {
+        books = books.filter(b => b.id !== id);
+        saveAndRender();
+      }
     }
 
     function openModal(id) {
@@ -672,7 +718,13 @@
           </div>
 
           <div style="margin-bottom:12px;">
-            <label style="font-size:0.75rem; font-weight:600;">Sinopsis:</label>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+              <label style="font-size:0.75rem; font-weight:600;">Sinopsis:</label>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-quick-search" onclick="openWebSearch('goodreads', 'edit', ${book.id})" style="padding: 2px 8px; font-size: 0.65rem;">🔍 GR</button>
+                <button class="btn-quick-search" onclick="openWebSearch('google', 'edit', ${book.id})" style="padding: 2px 8px; font-size: 0.65rem;">🔍 Google</button>
+              </div>
+            </div>
             <textarea id="edit-synopsis-${book.id}">${book.synopsis || ''}</textarea>
           </div>
 
